@@ -1,0 +1,14 @@
+[{"text":"class1",
+  "children":[
+    {"text":"William","leaf":"true"},
+    {"text":"Dallin","leaf":"true"},
+    {"text":"Laura","leaf":"true"},
+    {"text":"Hendricks","leaf":"true"},
+    {"text":"Barry","leaf":"true"},
+    {"text":"Demi","leaf":"true"},
+    {"text":"Gio","leaf":"true"}
+  ]},
+  {"text":"class2",
+    "children":[]
+  }
+]

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="../resources/css/ext-all.css" />
+    <!-- LIBS -->
+    <script type="text/javascript" src="../adapter/ext/ext-base.js"></script>
+    <!-- ENDLIBS -->
+    <script type="text/javascript" src="../ext-all.js"></script>
+    <script>
+
+        Ext.onReady(function () {
+            var root=new Ext.tree.AsyncTreeNode({
+                text: 'ITA',
+                draggable: false,
+                id: 'ita'});
+            var addNode = function (currentNode) {
+                if(currentNode===root) {
+                    Ext.MessageBox.prompt("输入框", "请输入所加班級的名字：", function (bu, txt) {
+                        if (bu === 'ok') {
+                            var newNode = new Ext.tree.TreeNode({text: txt});
+                            currentNode.appendChild(newNode)
+                        }
+                    });
+                }else if(currentNode.leaf){
+                    Ext.Msg.alert('學生節點不可再加子節點')
+                }else{
+                    Ext.MessageBox.prompt("输入框", "请输入所加學生的名字：", function (bu, txt) {
+                        if (bu === 'ok') {
+                            var newNode = new Ext.tree.TreeNode({text: txt});
+                            currentNode.appendChild(newNode)
+                        }
+                    });
+                }
+            }
+            var menu = new Ext.menu.Menu({
+                items: [
+                    {
+                        id: 'addNode',
+                        text: 'Add Node'
+                    },
+                    {
+                        id: 'deleteNode',
+                        text: 'Delete Node'
+                    }],
+                listeners: {
+                    itemclick: function (item) {
+                        switch (item.id) {
+                            case 'addNode':
+                                var currentNode = item.parentMenu.contextNode;
+                                addNode(currentNode)
+                                break;
+                            case 'deleteNode':
+                                var currentNode = item.parentMenu.contextNode;
+                                if (currentNode.parentNode) {
+                                    currentNode.remove();
+                                }
+                                break;
+                        }
+                    }
+                }
+            });
+
+            var tree = new Ext.tree.TreePanel({
+                // useArrows: true,
+                autoScroll: true,
+                animate: true,
+                enableDD: true,
+                containerScroll: true,
+                border: false,
+                contextMenu:menu,
+                // auto create TreeLoader
+                dataUrl: 'class.json',
+                root: root,
+                listeners: {
+                    contextmenu: function(node, e) {
+                        node.select();
+                        var treeContextMenu = node.getOwnerTree().contextMenu;
+                        treeContextMenu.contextNode = node;
+                        treeContextMenu.showAt(e.getXY());
+                    }
+                }
+            });
+            tree.render('tree-div');
+            tree.expandAll();
+            var formPanel = new Ext.FormPanel({
+               title:'增加節點',
+                width:400,
+                height:200,
+                bodyStyle:'padding:5px 5px 0',
+                layout: 'form',
+                items:[{
+                    id:'nodeValue',
+                    fieldLabel: '節點值',
+                    name: 'node',
+                    allowBlank:false,
+                    xtype: 'textfield',
+                    height:30
+                }],
+                buttons: [{
+                    text: 'Save',
+                    text:'提交',
+                    listeners: {
+                        'click': function () {
+                            var text=Ext.getDom('nodeValue').value
+                            var currentNode=tree.getSelectionModel().getSelectedNode()
+                            if (currentNode==null) {
+                                Ext.Msg.alert('請選中增加節點的位置')
+                            }
+                            if(currentNode===root) {
+                                var newNode = new Ext.tree.TreeNode({text: text});
+                                currentNode.appendChild(newNode)
+                            }else if(currentNode.leaf==null){
+                                Ext.Msg.alert('學生節點不可再加子節點')
+                            }else{
+                                var newNode = new Ext.tree.TreeNode({text: text});
+                                currentNode.appendChild(newNode)
+                            }
+                        }
+                    }
+                },{
+                    text: 'Cancel'
+                }]
+            });
+            var view = new Ext.Viewport({
+                layout:'border',
+                items:[{region:'west',items:[tree], width: 200, title: 'tree'},
+                    {region:'center',items:[formPanel]}]
+            });
+            var treeEditor=new Ext.tree.TreeEditor(tree,{allowBlank:false},{
+                listeners:{
+                    complete:function (editor,currVal,origVal) {
+                        Ext.Msg.alert('TreeEditor','您已經更改\"'+origVal+'\"為:'+currVal)}
+
+                }
+            });
+        });
+
+    </script>
+</head>
+<body>
+<div id="tree-div"></div>
+</body>
+</html>
